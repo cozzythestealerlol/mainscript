@@ -1,0 +1,325 @@
+local player = game.Players.LocalPlayer
+local tweenService = game:GetService("TweenService")
+local runService = game:GetService("RunService")
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "StealingUtilsGui"
+gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+gui.IgnoreGuiInset = true
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
+
+local blur = Instance.new("BlurEffect")
+blur.Size = 0
+blur.Parent = game.Lighting
+
+local bgFrame = Instance.new("Frame")
+bgFrame.Parent = gui
+bgFrame.Size = UDim2.new(1, 0, 1, 0)
+bgFrame.BackgroundTransparency = 1
+local bgGradient = Instance.new("UIGradient", bgFrame)
+bgGradient.Color = ColorSequence.new{
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 160, 130)),
+	ColorSequenceKeypoint.new(0.5, Color3.fromRGB(100, 150, 255)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 220, 200))
+}
+bgGradient.Rotation = 45
+
+local frame = Instance.new("Frame")
+frame.Parent = gui
+frame.Size = UDim2.new(0, 420, 0, 260)
+frame.Position = UDim2.new(0.5, 0, 0.5, 0)
+frame.AnchorPoint = Vector2.new(0.5, 0.5)
+frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+frame.BackgroundTransparency = 0.55
+frame.BorderSizePixel = 0
+frame.Active = true
+frame.Draggable = true
+
+local corner = Instance.new("UICorner", frame)
+corner.CornerRadius = UDim.new(0, 20)
+
+local gradient = Instance.new("UIGradient", frame)
+gradient.Color = ColorSequence.new{
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 180, 130)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(90, 140, 255))
+}
+gradient.Rotation = 45
+
+local closeBtn = Instance.new("TextButton")
+closeBtn.Parent = frame
+closeBtn.Text = "X"
+closeBtn.Size = UDim2.new(0, 30, 0, 30)
+closeBtn.Position = UDim2.new(1, -40, 0, 10)
+closeBtn.BackgroundTransparency = 0.8
+closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.TextSize = 20
+
+local closeCorner = Instance.new("UICorner", closeBtn)
+closeCorner.CornerRadius = UDim.new(1, 0)
+
+local tooltip = Instance.new("TextLabel")
+tooltip.Parent = closeBtn
+tooltip.Text = "Close"
+tooltip.BackgroundTransparency = 1
+tooltip.TextColor3 = Color3.fromRGB(255, 255, 255)
+tooltip.TextSize = 12
+tooltip.Position = UDim2.new(-0.3, 0, 1, 0)
+tooltip.Visible = false
+
+closeBtn.MouseEnter:Connect(function()
+	closeBtn.BackgroundTransparency = 0.5
+	tooltip.Visible = true
+end)
+closeBtn.MouseLeave:Connect(function()
+	closeBtn.BackgroundTransparency = 0.8
+	tooltip.Visible = false
+end)
+closeBtn.MouseButton1Click:Connect(function()
+	gui:Destroy()
+	blur:Destroy()
+end)
+
+local title = Instance.new("TextLabel")
+title.Parent = frame
+title.Text = "Stealing Utils"
+title.Size = UDim2.new(1, 0, 0, 40)
+title.Position = UDim2.new(0, 0, 0, 10)
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 24
+title.BackgroundTransparency = 1
+
+local statusLabel = Instance.new("TextLabel")
+statusLabel.Parent = frame
+statusLabel.Size = UDim2.new(1, 0, 0, 30)
+statusLabel.Position = UDim2.new(0, 0, 1, -40)
+statusLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+statusLabel.Font = Enum.Font.Gotham
+statusLabel.TextSize = 18
+statusLabel.BackgroundTransparency = 1
+statusLabel.Text = "Ready To Use!"
+
+local actionBtn = Instance.new("TextButton")
+actionBtn.Parent = frame
+actionBtn.Size = UDim2.new(0, 200, 0, 50)
+actionBtn.Position = UDim2.new(0.5, -100, 0, 70)
+actionBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+actionBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+actionBtn.Font = Enum.Font.GothamBold
+actionBtn.TextSize = 20
+actionBtn.Text = "Stealing Util"
+local actionCorner = Instance.new("UICorner", actionBtn)
+actionCorner.CornerRadius = UDim.new(0, 12)
+
+local chooseBaseBtn = Instance.new("TextButton")
+chooseBaseBtn.Parent = frame
+chooseBaseBtn.Size = UDim2.new(0, 200, 0, 50)
+chooseBaseBtn.Position = UDim2.new(0.5, -100, 0, 130)
+chooseBaseBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+chooseBaseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+chooseBaseBtn.Font = Enum.Font.GothamBold
+chooseBaseBtn.TextSize = 20
+chooseBaseBtn.Text = "Choose Base"
+local baseCorner = Instance.new("UICorner", chooseBaseBtn)
+baseCorner.CornerRadius = UDim.new(0, 12)
+
+local currentTween
+local running = false
+local basePositions = {
+	Vector3.new(190.03, 10.27, 71.58),
+	Vector3.new(185.11, 11.42, 13.97)
+}
+
+local function stopTween()
+	if currentTween then
+		currentTween:Cancel()
+		currentTween = nil
+	end
+end
+
+actionBtn.MouseButton1Click:Connect(function()
+	if not running then
+		running = true
+		actionBtn.Text = "Stop Stealing Util"
+		statusLabel.Text = "Active"
+
+		coroutine.wrap(function()
+			local character = player.Character
+			if character and character:FindFirstChild("HumanoidRootPart") then
+				local hrp = character.HumanoidRootPart
+
+				-- Tween to special coordinates (2s)
+				local firstTween = tweenService:Create(hrp, TweenInfo.new(2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {CFrame = CFrame.new(432.40, 9.12, 96.18)})
+				firstTween:Play()
+				firstTween.Completed:Wait()
+
+				wait(5)
+
+				local secondTween = tweenService:Create(hrp, TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {CFrame = CFrame.new(basePositions[1])})
+				secondTween:Play()
+				secondTween.Completed:Wait()
+
+				local thirdTween = tweenService:Create(hrp, TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {CFrame = CFrame.new(basePositions[2])})
+				thirdTween:Play()
+				thirdTween.Completed:Wait()
+			end
+
+			running = false
+			actionBtn.Text = "Stealing Util"
+			statusLabel.Text = "Ready To Use!"
+		end)()
+	else
+		running = false
+		stopTween()
+		actionBtn.Text = "Stealing Util"
+		statusLabel.Text = "Ready To Use!"
+	end
+end)
+
+-- Base selection GUI
+chooseBaseBtn.MouseButton1Click:Connect(function()
+	local baseGui = Instance.new("ScreenGui")
+	baseGui.Name = "BaseSelectorGui"
+	baseGui.Parent = player:WaitForChild("PlayerGui")
+
+	local baseFrame = Instance.new("Frame")
+	baseFrame.Parent = baseGui
+	baseFrame.Size = UDim2.new(0, 300, 0, 450)
+	baseFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+	baseFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+	baseFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+	baseFrame.BackgroundTransparency = 0.55
+	baseFrame.BorderSizePixel = 0
+
+	local corner = Instance.new("UICorner", baseFrame)
+	corner.CornerRadius = UDim.new(0, 20)
+
+	local gradient = Instance.new("UIGradient", baseFrame)
+	gradient.Color = ColorSequence.new{
+		ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 180, 130)),
+		ColorSequenceKeypoint.new(1, Color3.fromRGB(90, 140, 255))
+	}
+	gradient.Rotation = 45
+
+	local title = Instance.new("TextLabel")
+	title.Parent = baseFrame
+	title.Text = "Select Base"
+	title.Size = UDim2.new(1, 0, 0, 40)
+	title.Position = UDim2.new(0, 0, 0, 10)
+	title.TextColor3 = Color3.fromRGB(255, 255, 255)
+	title.Font = Enum.Font.GothamBold
+	title.TextSize = 24
+	title.BackgroundTransparency = 1
+
+	local bases = {
+		{"Base 1", Vector3.new(-80.16, 10.12, 208.80), Vector3.new(-75.44, 11.40, 265.99)},
+		{"Base 2", Vector3.new(9.71, 10.27, 209.32), Vector3.new(15.17, 11.42, 264.96)},
+		{"Base 3", Vector3.new(99.67, 10.00, 207.17), Vector3.new(105.93, 11.42, 266.59)},
+		{"Base 4", Vector3.new(201.57, 10.06, 214.68), Vector3.new(207.85, 11.36, 270.71)},
+		{"Base 5", Vector3.new(10.59, 10.12, 72.01), Vector3.new(5.43, 11.43, 15.66)},
+		{"Base 6", Vector3.new(100.11, 10.06, 73.35), Vector3.new(96.19, 11.42, 14.93)},
+		{"Base 7", Vector3.new(190.03, 10.27, 71.58), Vector3.new(185.11, 11.42, 13.97)},
+		{"Base 8", Vector3.new(-79.26, 10.12, 71.99), Vector3.new(-85.57, 11.43, 15.35)}
+	}
+
+	local baseColors = {
+		Color3.fromRGB(255, 0, 0),
+		Color3.fromRGB(0, 255, 0),
+		Color3.fromRGB(0, 0, 255),
+		Color3.fromRGB(255, 255, 0),
+		Color3.fromRGB(255, 0, 255),
+		Color3.fromRGB(0, 255, 255),
+		Color3.fromRGB(128, 0, 128),
+		Color3.fromRGB(255, 128, 0)
+	}
+
+	local tracerObjects = {}
+
+	-- Function to create a tracer
+	local function createTracer(basePosition, color)
+		local part = Instance.new("Part")
+		part.Anchored = true
+		part.CanCollide = false
+		part.Size = Vector3.new(0.2, 0.2, 1) -- initial size
+		part.Color = color
+		part.Parent = workspace
+		table.insert(tracerObjects, {part = part, target = basePosition})
+	end
+
+	-- Create tracers
+	for i, baseInfo in ipairs(bases) do
+		createTracer(baseInfo[2], baseColors[i])
+	end
+
+	-- Update tracers every frame
+	local tracerConnection
+	tracerConnection = runService.RenderStepped:Connect(function()
+		if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+			local hrpPos = player.Character.HumanoidRootPart.Position
+			for _, t in pairs(tracerObjects) do
+				local distance = (hrpPos - t.target).Magnitude
+				t.part.Size = Vector3.new(0.2, 0.2, distance)
+				t.part.CFrame = CFrame.new((hrpPos + t.target)/2, t.target)
+			end
+		end
+	end)
+
+	-- Legend GUI
+	local legendFrame = Instance.new("Frame")
+	legendFrame.Parent = baseFrame
+	legendFrame.Size = UDim2.new(0, 120, 0, 220)
+	legendFrame.Position = UDim2.new(1, 10, 0, 50)
+	legendFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+	legendFrame.BackgroundTransparency = 0.4
+	local legendCorner = Instance.new("UICorner", legendFrame)
+	legendCorner.CornerRadius = UDim.new(0, 10)
+
+	local padding = 10
+	for i, baseInfo in ipairs(bases) do
+		local colorLabel = Instance.new("TextLabel")
+		colorLabel.Parent = legendFrame
+		colorLabel.Size = UDim2.new(0, 100, 0, 20)
+		colorLabel.Position = UDim2.new(0, padding, 0, padding + (i-1)*25)
+		colorLabel.BackgroundColor3 = baseColors[i]
+		colorLabel.BackgroundTransparency = 0.1
+		colorLabel.Text = "  " .. baseInfo[1]
+		colorLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+		colorLabel.Font = Enum.Font.Gotham
+		colorLabel.TextSize = 14
+		colorLabel.TextXAlignment = Enum.TextXAlignment.Left
+	end
+
+	-- Base selection buttons
+	for i, info in ipairs(bases) do
+		local btn = Instance.new("TextButton")
+		btn.Parent = baseFrame
+		btn.Size = UDim2.new(0, 200, 0, 40)
+		btn.Position = UDim2.new(0.5, -100, 0, 60 + (i-1)*50)
+		btn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+		btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+		btn.Font = Enum.Font.GothamBold
+		btn.TextSize = 20
+		btn.Text = info[1]
+
+		local corner = Instance.new("UICorner", btn)
+		corner.CornerRadius = UDim.new(0, 12)
+
+		btn.MouseButton1Click:Connect(function()
+			basePositions = {info[2], info[3]}
+			baseGui:Destroy()
+			-- Destroy tracers
+			for _, t in pairs(tracerObjects) do
+				t.part:Destroy()
+			end
+			if tracerConnection then
+				tracerConnection:Disconnect()
+			end
+			-- Tween to base first coordinate
+			if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+				tweenService:Create(player.Character.HumanoidRootPart, TweenInfo.new(1), {CFrame = CFrame.new(info[2])}):Play()
+			end
+		end)
+	end
+end)
