@@ -1,3 +1,9 @@
+--[[ 
+	Stealing Utils + Tycoon Item Finder + Brainrot Finder + Instant ProximityPrompt
+	Full integrated GUI
+--]]
+
+-- Services
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local TweenService = game:GetService("TweenService")
@@ -15,54 +21,58 @@ gui.IgnoreGuiInset = true
 gui.ResetOnSpawn = false
 gui.Parent = player:WaitForChild("PlayerGui")
 
+-- Blur effect
 local blur = Instance.new("BlurEffect")
 blur.Size = 0
 blur.Parent = Lighting
 
+-- Background gradient frame
 local bgFrame = Instance.new("Frame")
 bgFrame.Parent = gui
-bgFrame.Size = UDim2.new(1, 0, 1, 0)
+bgFrame.Size = UDim2.new(1,0,1,0)
 bgFrame.BackgroundTransparency = 1
 local bgGradient = Instance.new("UIGradient", bgFrame)
 bgGradient.Color = ColorSequence.new{
-	ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 160, 130)),
-	ColorSequenceKeypoint.new(0.5, Color3.fromRGB(100, 150, 255)),
-	ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 220, 200))
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(255,160,130)),
+	ColorSequenceKeypoint.new(0.5, Color3.fromRGB(100,150,255)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(255,220,200))
 }
 bgGradient.Rotation = 45
 
+-- Main frame
 local frame = Instance.new("Frame")
 frame.Parent = gui
-frame.Size = UDim2.new(0, 420, 0, 300)
-frame.Position = UDim2.new(0.5, 0, 0.5, 0)
-frame.AnchorPoint = Vector2.new(0.5, 0.5)
-frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+frame.Size = UDim2.new(0, 400, 0, 290)
+frame.Position = UDim2.new(0.5,0,0.5,0)
+frame.AnchorPoint = Vector2.new(0.5,0.5)
+frame.BackgroundColor3 = Color3.fromRGB(50,50,50)
 frame.BackgroundTransparency = 0.55
 frame.BorderSizePixel = 0
 frame.Active = true
 frame.Draggable = true
 
 local corner = Instance.new("UICorner", frame)
-corner.CornerRadius = UDim.new(0, 20)
+corner.CornerRadius = UDim.new(0,20)
+
 local gradient = Instance.new("UIGradient", frame)
 gradient.Color = ColorSequence.new{
-	ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 180, 130)),
-	ColorSequenceKeypoint.new(1, Color3.fromRGB(90, 140, 255))
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(255,180,130)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(90,140,255))
 }
 gradient.Rotation = 45
 
 -- Close button
 local closeBtn = Instance.new("TextButton")
 closeBtn.Parent = frame
-closeBtn.Text = "X"
-closeBtn.Size = UDim2.new(0, 30, 0, 30)
-closeBtn.Position = UDim2.new(1, -40, 0, 10)
+closeBtn.Size = UDim2.new(0,30,0,30)
+closeBtn.Position = UDim2.new(1,-40,0,10)
 closeBtn.BackgroundTransparency = 0.8
-closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeBtn.TextColor3 = Color3.fromRGB(255,255,255)
 closeBtn.Font = Enum.Font.GothamBold
 closeBtn.TextSize = 20
+closeBtn.Text = "X"
 local closeCorner = Instance.new("UICorner", closeBtn)
-closeCorner.CornerRadius = UDim.new(1, 0)
+closeCorner.CornerRadius = UDim.new(1,0)
 closeBtn.MouseButton1Click:Connect(function()
 	gui:Destroy()
 	blur:Destroy()
@@ -71,20 +81,20 @@ end)
 -- Title
 local title = Instance.new("TextLabel")
 title.Parent = frame
-title.Text = "Stealing Utils"
-title.Size = UDim2.new(1, 0, 0, 40)
-title.Position = UDim2.new(0, 0, 0, 10)
-title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.Size = UDim2.new(1,0,0,40)
+title.Position = UDim2.new(0,0,0,10)
+title.BackgroundTransparency = 1
+title.TextColor3 = Color3.fromRGB(255,255,255)
 title.Font = Enum.Font.GothamBold
 title.TextSize = 24
-title.BackgroundTransparency = 1
+title.Text = "Stealing Utils"
 
--- Status Labels
+-- Status labels
 local statusLabel = Instance.new("TextLabel")
 statusLabel.Parent = frame
-statusLabel.Size = UDim2.new(1, 0, 0, 20)
-statusLabel.Position = UDim2.new(0, 0, 0, 50)
-statusLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+statusLabel.Size = UDim2.new(1,0,0,20)
+statusLabel.Position = UDim2.new(0,0,0,50)
+statusLabel.TextColor3 = Color3.fromRGB(255,255,255)
 statusLabel.Font = Enum.Font.Gotham
 statusLabel.TextSize = 18
 statusLabel.BackgroundTransparency = 1
@@ -181,52 +191,6 @@ end
 detectNearestBase()
 
 -- ----------------------------
--- Stealing Util
--- ----------------------------
-local function stopTween()
-	if currentTween then
-		currentTween:Cancel()
-		currentTween = nil
-	end
-end
-
-actionBtn.MouseButton1Click:Connect(function()
-	if not running then
-		running = true
-		actionBtn.Text = "Stop Stealing Util"
-		statusLabel.Text = "Active"
-		coroutine.wrap(function()
-			local character = player.Character
-			if character and character:FindFirstChild("HumanoidRootPart") then
-				local hrp = character.HumanoidRootPart
-
-				local firstTween = TweenService:Create(hrp, TweenInfo.new(1,Enum.EasingStyle.Quad,Enum.EasingDirection.Out),{CFrame=CFrame.new(432.40,10,96.18)})
-				firstTween:Play()
-				firstTween.Completed:Wait()
-
-				wait(5)
-
-				local secondTween = TweenService:Create(hrp, TweenInfo.new(1,Enum.EasingStyle.Quad,Enum.EasingDirection.Out),{CFrame=CFrame.new(basePositions[1])})
-				secondTween:Play()
-				secondTween.Completed:Wait()
-
-				local thirdTween = TweenService:Create(hrp, TweenInfo.new(1,Enum.EasingStyle.Quad,Enum.EasingDirection.Out),{CFrame=CFrame.new(basePositions[2])})
-				thirdTween:Play()
-				thirdTween.Completed:Wait()
-			end
-			running = false
-			actionBtn.Text = "Stealing Util"
-			statusLabel.Text = "Ready To Use!"
-		end)()
-	else
-		running = false
-		stopTween()
-		actionBtn.Text = "Stealing Util"
-		statusLabel.Text = "Ready To Use!"
-	end
-end)
-
--- ----------------------------
 -- Choose Base GUI
 -- ----------------------------
 chooseBaseBtn.MouseButton1Click:Connect(function()
@@ -274,12 +238,135 @@ chooseBaseBtn.MouseButton1Click:Connect(function()
 			selectedBaseLabel.Text = "Selected Base: "..baseName
 			baseGui:Destroy()
 			if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-				TweenService:Create(player.Character.HumanoidRootPart, TweenInfo.new(1), {CFrame=CFrame.new(info[2])}):Play()
+				-- TP instantly to first coordinate
+				player.Character.HumanoidRootPart.CFrame = CFrame.new(info[2])
 			end
 		end)
 	end
 end)
 
+-- ----------------------------
+-- Stealing Util
+-- ----------------------------
+actionBtn.MouseButton1Click:Connect(function()
+	if not running then
+		running = true
+		actionBtn.Text = "Stop Stealing Util"
+		statusLabel.Text = "Active"
+		coroutine.wrap(function()
+			local character = player.Character
+			if character and character:FindFirstChild("HumanoidRootPart") then
+				local hrp = character.HumanoidRootPart
+
+				-- Teleport to special coordinates
+				hrp.CFrame = CFrame.new(432.40,10,96.18)
+
+				wait(4) -- wait for interaction
+
+				-- Tween to first coordinate of base
+				local firstTween = TweenService:Create(hrp, TweenInfo.new(1,Enum.EasingStyle.Quad,Enum.EasingDirection.Out),{CFrame=CFrame.new(basePositions[1])})
+				firstTween:Play()
+				firstTween.Completed:Wait()
+
+				-- Tween to second coordinate of base
+				local secondTween = TweenService:Create(hrp, TweenInfo.new(1,Enum.EasingStyle.Quad,Enum.EasingDirection.Out),{CFrame=CFrame.new(basePositions[2])})
+				secondTween:Play()
+				secondTween.Completed:Wait()
+			end
+			running = false
+			actionBtn.Text = "Stealing Util"
+			statusLabel.Text = "Ready To Use!"
+		end)()
+	else
+		running = false
+		if currentTween then
+			currentTween:Cancel()
+			currentTween = nil
+		end
+		actionBtn.Text = "Stealing Util"
+		statusLabel.Text = "Ready To Use!"
+	end
+end)
+
+-- ----------------------------
+-- Instant ProximityPrompt
+-- ----------------------------
+local function setStealPrompt()
+	for _, descendant in ipairs(Workspace:GetDescendants()) do
+		if descendant:IsA("ProximityPrompt") and descendant.Name == "StealPrompt" then
+			if descendant.HoldDuration ~= 0 then
+				descendant.HoldDuration = 0
+			end
+		end
+	end
+end
+
+-- Popup for Instant Prompt
+local promptGui = Instance.new("ScreenGui")
+promptGui.Name = "InstantPromptPopup"
+promptGui.Parent = player:WaitForChild("PlayerGui")
+
+local promptFrame = Instance.new("Frame")
+promptFrame.Parent = promptGui
+promptFrame.Size = UDim2.new(0,300,0,150)
+promptFrame.Position = UDim2.new(0.5,0,0.5,0)
+promptFrame.AnchorPoint = Vector2.new(0.5,0.5)
+promptFrame.BackgroundColor3 = Color3.fromRGB(50,50,50)
+promptFrame.BackgroundTransparency = 0.5
+promptFrame.BorderSizePixel = 0
+local corner = Instance.new("UICorner", promptFrame)
+corner.CornerRadius = UDim.new(0,20)
+
+local text = Instance.new("TextLabel")
+text.Parent = promptFrame
+text.Size = UDim2.new(1,0,0,60)
+text.Position = UDim2.new(0,0,0,20)
+text.BackgroundTransparency = 1
+text.Text = "Do You Want To Turn On Instant ProximityPrompt?"
+text.TextColor3 = Color3.fromRGB(255,255,255)
+text.Font = Enum.Font.GothamBold
+text.TextSize = 18
+text.TextWrapped = true
+
+local yesBtn = Instance.new("TextButton")
+yesBtn.Parent = promptFrame
+yesBtn.Size = UDim2.new(0,100,0,40)
+yesBtn.Position = UDim2.new(0.2,0,0.7,0)
+yesBtn.Text = "Yes"
+yesBtn.Font = Enum.Font.GothamBold
+yesBtn.TextSize = 18
+local yesCorner = Instance.new("UICorner", yesBtn)
+yesCorner.CornerRadius = UDim.new(0,12)
+
+local noBtn = Instance.new("TextButton")
+noBtn.Parent = promptFrame
+noBtn.Size = UDim2.new(0,100,0,40)
+noBtn.Position = UDim2.new(0.6,0,0.7,0)
+noBtn.Text = "No"
+noBtn.Font = Enum.Font.GothamBold
+noBtn.TextSize = 18
+local noCorner = Instance.new("UICorner", noBtn)
+noCorner.CornerRadius = UDim.new(0,12)
+
+yesBtn.MouseButton1Click:Connect(function()
+	setStealPrompt()
+	promptGui:Destroy()
+end)
+
+noBtn.MouseButton1Click:Connect(function()
+	promptGui:Destroy()
+end)
+
+Workspace.DescendantAdded:Connect(function(descendant)
+	if descendant:IsA("ProximityPrompt") and descendant.Name == "StealPrompt" then
+		descendant.HoldDuration = 0
+	end
+end)
+
+-- ----------------------------
+-- Brainrot Finder
+-- ----------------------------
+brainrotBtn.MouseButton1Click:Connect(function()
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local workspace = game:GetService("Workspace")
@@ -545,9 +632,10 @@ while true do
     task.wait(5)
     scanTycoons()
 end
-
+	print("Brainrot Finder button clicked!")
+end)
 
 -- ----------------------------
 -- Auto-update nearest base
 -- ----------------------------
-RunService.Heartbeat:Connect(detectNearestBase)
+detectNearestBase()
