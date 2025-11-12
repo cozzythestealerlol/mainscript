@@ -204,7 +204,7 @@ actionBtn.MouseButton1Click:Connect(function()
 				firstTween:Play()
 				firstTween.Completed:Wait()
 
-				wait(1)
+				wait(5)
 
 				local secondTween = TweenService:Create(hrp, TweenInfo.new(1,Enum.EasingStyle.Quad,Enum.EasingDirection.Out),{CFrame=CFrame.new(basePositions[1])})
 				secondTween:Play()
