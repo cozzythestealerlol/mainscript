@@ -259,7 +259,7 @@ actionBtn.MouseButton1Click:Connect(function()
 				local hrp = character.HumanoidRootPart
 
 				-- Teleport to special coordinates
-				hrp.CFrame = CFrame.new(432.40,10,96.18)
+				hrp.CFrame = CFrame.new(432.40,15,96.18)
 
 				wait(4) -- wait for interaction
 
