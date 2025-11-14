@@ -261,7 +261,7 @@ actionBtn.MouseButton1Click:Connect(function()
 				-- Teleport to special coordinates
 				hrp.CFrame = CFrame.new(432.40,15,96.18)
 
-				wait(4) -- wait for interaction
+				wait(5) -- wait for interaction
 
 				-- Tween to first coordinate of base
 				local firstTween = TweenService:Create(hrp, TweenInfo.new(1,Enum.EasingStyle.Quad,Enum.EasingDirection.Out),{CFrame=CFrame.new(basePositions[1])})
